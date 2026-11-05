@@ -1,0 +1,9 @@
+{
+  "name": "live-highlight-clipping-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "中文直播高光短视频剪辑智能体原型",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=20" },
+  "dependencies": { "express": "^4.21.2", "multer": "^1.4.5-lts.1" }
+}
