@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>直播高光短视频剪辑智能体建设方案</title>
+<style>
+@page { size: A4; margin: 2.1cm 2cm; }
+body { font-family: "Microsoft YaHei", "SimSun", sans-serif; color:#222; line-height:1.75; max-width:900px; margin:32px auto; padding:0 28px; }
+h1 { text-align:center; font-size:28pt; margin-top:100px; color:#17365D; }
+.subtitle { text-align:center; font-size:15pt; color:#555; margin:20px 0 90px; }
+h2 { color:#17365D; border-bottom:1px solid #9EADBF; padding-bottom:6px; margin-top:30px; font-size:18pt; }
+h3 { color:#24527A; font-size:13.5pt; margin-top:22px; }
+p, li { font-size:11pt; }
+table { border-collapse:collapse; width:100%; margin:14px 0 22px; font-size:10pt; }
+th,td { border:1px solid #AAB7C4; padding:7px 9px; vertical-align:top; }
+th { background:#DCE6F1; color:#17365D; }
+code, pre { font-family:Consolas, monospace; background:#F3F5F7; }
+pre { white-space:pre-wrap; padding:12px; border:1px solid #ddd; font-size:9pt; }
+.callout { background:#EEF4FA; border-left:4px solid #4472C4; padding:10px 14px; margin:14px 0; }
+.cover { page-break-after:always; }
+.small { color:#666; font-size:9pt; }
+</style>
+</head>
+<body>
+<section class="cover">
+<h1>直播高光短视频剪辑智能体<br>建设与执行方案</h1>
+<div class="subtitle">基于 HyperFrames 的直播内容理解、亮点筛选与自动化视频生产</div>
+<p style="text-align:center">适用项目：银发歌唱教育 AI 智能体及其他直播内容场景</p>
+<p style="text-align:center">文档版本：1.0　|　日期：2026年11月</p>
+<div class="callout" style="margin-top:100px"><b>方案核心：</b>先理解直播内容，识别真正值得传播的高光，再剪辑和包装；HyperFrames 负责可编辑、可复现的视频合成与渲染，不把“套模板”误当成“识别亮点”。片头与片尾海报画面采用同一份静态视觉源，确保首帧和尾帧画面一致。</div>
+</section>
+<h2>一、方案摘要</h2>
+<p>本方案建设一个可执行的直播高光短视频智能体。用户上传直播录像后，系统完成媒体检查、音视频转写、内容分段、焦点识别、高光评分、候选片段审核、字幕与视觉包装、HyperFrames 渲染及成片下载。系统的目标不是把直播机械地切成若干段，而是找到具有明确主题、信息价值、情绪或互动亮点，并且脱离直播上下文仍能看懂的片段。</p>
+<p>产品由智能体工作台（前端）、业务 API 与任务编排后端、媒体分析服务、对象存储/数据库、HyperFrames 项目生成与渲染服务构成。模型给出候选与依据，规则负责安全边界和质量门槛，用户可在时间轴上复核、改起止点、改标题和字幕，然后确认渲染。</p>
+<h2>二、产品目标与设计原则</h2>
+<ul><li><b>高光优先：</b>只推荐有明确亮点的内容，不以“每隔固定时长切一刀”作为剪辑逻辑。</li><li><b>可解释：</b>每个推荐片段展示起止时间、内容摘要、亮点类型、评分依据及转写证据。</li><li><b>人机协作：</b>自动生成候选，用户可以接受、排除、合并、拆分、调整入点/出点，未经确认不自动发布。</li><li><b>适合银发歌唱教育：</b>优先发现教师示范、学员进步、唱法纠正前后对比、易懂技巧、答疑互动、集体共鸣和课堂成果。</li><li><b>可复现可编辑：</b>HyperFrames 使用 HTML/CSS/JavaScript 时间线组合，保留项目文件与素材引用，便于重新渲染。</li><li><b>隐私与版权：</b>上传授权、访问控制、保留期限、音乐授权、肖像与声音使用授权均纳入产品流程。</li></ul>
+<h2>三、用户与智能体页面</h2>
+<h3>3.1 页面信息架构</h3>
+<table><tr><th>页面/区域</th><th>主要内容</th><th>关键操作</th></tr>
+<tr><td>登录与项目首页</td><td>项目列表、近期任务、配额与状态</td><td>新建剪辑任务、查看历史、管理成员</td></tr>
+<tr><td>新建任务/上传</td><td>拖拽上传、文件信息、直播场景、目标平台、目标时长、画幅、字幕语言</td><td>上传、取消、选择是否保留原声、填写版权/授权确认</td></tr>
+<tr><td>智能体分析工作台</td><td>任务进度、直播摘要、章节时间线、转写文本、候选高光卡片、评分与理由</td><td>查看证据、重跑分析、反馈“有用/不相关”、筛选标签</td></tr>
+<tr><td>切片编辑器</td><td>视频预览、波形/时间轴、入点出点、字幕、标题、封面、音乐、模板预览</td><td>拖动边界、逐字修正字幕、静音/保留原声、保存草稿、确认渲染</td></tr>
+<tr><td>模板与品牌设置</td><td>品牌色、字体、角标、片头片尾海报、字幕样式、音乐曲库</td><td>新建模板、上传海报/字体/授权音乐、预览模板</td></tr>
+<tr><td>渲染与交付</td><td>渲染队列、成功/失败状态、输出规格、预览与文件列表</td><td>下载 MP4、下载封面、复制分享链接、重新渲染、删除</td></tr>
+<tr><td>设置与合规</td><td>成员权限、存储期限、删除策略、审计记录、第三方模型配置</td><td>设置保留期、撤销访问、申请删除</td></tr></table>
+<h3>3.2 智能体工作台交互流程</h3>
+<ol><li>用户新建项目并上传直播录像；前端显示上传进度、校验结果和预计分析状态。</li><li>分析完成后呈现章节概览与高光候选。每张候选卡显示缩略图、时间范围、推荐标题、内容摘要、类型、总分及分项分数。</li><li>点击候选可播放带时间码的视频并查看对应转写文本。证据不足、音频不清或画面缺失时明确提示，不虚构内容。</li><li>用户挑选候选，设定竖屏/横屏、目标时长、字幕样式、标题和音乐；支持批量应用模板。</li><li>预览后确认渲染。渲染成功后提供 MP4、封面和可选的项目包下载；失败显示可理解的错误与重试入口。</li></ol>
+<h3>3.3 页面状态与错误处理</h3>
+<p>任务状态统一为：queued（排队）、uploading（上传中）、analyzing（分析中）、review_required（待审核）、rendering（渲染中）、succeeded（完成）、failed（失败）、cancelled（取消）。长任务用轮询或 Server-Sent Events 推送进度；网络中断后可恢复查看。错误需分为格式不支持、文件损坏、无可用音轨、转写失败、素材缺失、HyperFrames 检查失败、渲染超时等，并给出下一步操作。</p>
+<h2>四、系统架构与责任边界</h2>
+<pre>浏览器前端（工作台 / 编辑器）
+  ├─ 业务 API：身份、项目、上传、任务、候选、编辑、渲染、下载
+  └─ 任务编排服务（队列 / 状态机）
+       ├─ 媒体预处理：FFmpeg 探测、抽音频、代理视频、关键帧
+       ├─ 内容理解：ASR 转写、说话人/章节、文本与视听事件分析
+       ├─ 高光决策：候选生成、评分、去重、时长与上下文校验
+       ├─ 剪辑计划：时间码、字幕、标题、画幅适配、模板参数
+       └─ HyperFrames 生产器：生成项目 → check → preview/review → render
+存储：关系数据库 + 对象存储（原片、代理、缩略图、转写、项目文件、成片）
+</pre>
+<p><b>职责边界：</b>HyperFrames 是 HTML 原生、可逐帧确定性渲染的视频合成/渲染引擎。它负责把已选定的片段、图形、字幕、音乐和动画按时间线渲染；直播语义理解、ASR、亮点判断、素材权限、用户审核和任务管理属于本系统的上游业务能力，不能假设 HyperFrames 自己会判断高光。</p>
+<h2>五、前端实施设计</h2>
+<h3>5.1 推荐前端模块</h3>
+<p>采用 React 或 Vue 均可，优先把视频、时间线、任务状态、表单校验拆为独立模块。核心组件包括：上传器（分片/断点续传）、任务状态面板、候选高光卡片、播放器（时间码跳转）、波形与剪辑边界编辑器、字幕编辑表格、模板预览器、渲染任务列表和下载组件。</p>
+<h3>5.2 前端与后端交互约定</h3>
+<ul><li>所有业务请求带登录态；项目/任务资源必须做服务端权限校验，不能只依赖前端隐藏按钮。</li><li>耗时操作返回 task_id，前端通过事件流或定时查询获取进度；上传采用预签名 URL，避免大文件经业务服务器转发。</li><li>时间统一使用原片时间轴的秒（小数），展示为 HH:MM:SS.mmm；裁切服务需处理关键帧与编码误差。</li><li>前端编辑只提交差异配置，保留原始 AI 结果，支持撤销/重做与草稿版本。</li><li>上传、分析、渲染的每一步展示可取消/重试策略；重复请求使用 Idempotency-Key 防止重复创建任务。</li></ul>
+<h2>六、后端 API 设计（建议 REST API v1）</h2>
+<p>基础路径：<code>/api/v1</code>。返回统一结构 <code>{"data":...,"error":null,"request_id":"..."}</code>；错误结构含 <code>code</code>、<code>message</code>、可安全展示的 <code>details</code>。鉴权采用会话或 OAuth/JWT；所有对象按 tenant/project 做权限隔离。</p>
+<table><tr><th>方法与路径</th><th>用途/请求要点</th><th>成功响应</th></tr>
+<tr><td>POST /projects</td><td>创建项目。body：name、scene、default_template_id</td><td>201：project</td></tr>
+<tr><td>GET /projects</td><td>获取当前用户可访问项目；支持 cursor、limit</td><td>200：items、next_cursor</td></tr>
+<tr><td>POST /media/uploads</td><td>申请上传。body：project_id、filename、size_bytes、mime_type、checksum</td><td>201：media_id、upload_url、parts、expires_at</td></tr>
+<tr><td>POST /media/{media_id}/complete</td><td>确认上传完成并触发媒体探测；校验大小/哈希</td><td>202：media、probe_task_id</td></tr>
+<tr><td>GET /media/{media_id}</td><td>查询媒体探测、时长、分辨率、音轨信息、处理状态</td><td>200：media metadata</td></tr>
+<tr><td>POST /projects/{project_id}/clip-jobs</td><td>创建分析任务。body：media_id、scene、language、target_aspect_ratio、duration_range、max_clips、focus_tags、options</td><td>202：job_id、status</td></tr>
+<tr><td>GET /jobs/{job_id}</td><td>获取任务状态、阶段、百分比、错误与时间戳</td><td>200：job status</td></tr>
+<tr><td>GET /jobs/{job_id}/events</td><td>SSE 事件流；事件含 stage、progress、message、updated_at</td><td>text/event-stream</td></tr>
+<tr><td>POST /jobs/{job_id}/cancel</td><td>取消可取消的分析/渲染任务</td><td>202：status</td></tr>
+<tr><td>GET /jobs/{job_id}/transcript</td><td>获取带时间码的转写段、说话人、置信度</td><td>200：segments[]</td></tr>
+<tr><td>GET /jobs/{job_id}/highlights</td><td>按分数/时间/类别查询候选高光</td><td>200：items[]</td></tr>
+<tr><td>PATCH /highlights/{highlight_id}</td><td>更新标题、标签、时间边界、用户审核状态；保存版本</td><td>200：更新后候选</td></tr>
+<tr><td>POST /highlights/{highlight_id}/feedback</td><td>反馈接受/拒绝及原因，用于后续评估；不得直接把反馈当成未经审核的训练数据</td><td>202：feedback_id</td></tr>
+<tr><td>POST /projects/{project_id}/renders</td><td>创建渲染。body：selected_highlight_ids、template_id、format、captions、music_asset_id、poster_asset_id、include_original_audio</td><td>202：render_id、status</td></tr>
+<tr><td>GET /renders/{render_id}</td><td>渲染进度、HyperFrames check 结果、输出规格、错误</td><td>200：render status</td></tr>
+<tr><td>GET /renders/{render_id}/outputs</td><td>获取成片、封面、字幕文件、项目包的短时下载链接</td><td>200：outputs[]</td></tr>
+<tr><td>POST /renders/{render_id}/retry</td><td>对可重试的渲染失败重新排队</td><td>202：new attempt</td></tr>
+<tr><td>GET /templates</td><td>列出当前项目可用的包装模板</td><td>200：templates[]</td></tr>
+<tr><td>POST /assets</td><td>上传海报、音乐、字体或品牌图形；记录授权与来源</td><td>201：asset</td></tr>
+<tr><td>DELETE /media/{media_id}</td><td>删除原片及衍生资产；异步删除并返回追踪状态</td><td>202：deletion job</td></tr></table>
+<h3>6.1 示例：创建剪辑分析任务</h3>
+<pre>POST /api/v1/projects/p_123/clip-jobs
+{
+  "media_id": "m_456",
+  "scene": "senior_singing_education",
+  "language": "zh-CN",
+  "target_aspect_ratio": "9:16",
+  "duration_range": {"min_seconds": 15, "max_seconds": 60},
+  "max_clips": 8,
+  "focus_tags": ["教师示范", "唱法纠正", "学员进步", "答疑互动", "课堂共鸣"],
+  "options": {"include_transcript": true, "require_user_approval": true}
+}</pre>
+<h3>6.2 示例：高光候选数据</h3>
+<pre>{
+  "id": "h_001",
+  "start_seconds": 842.4,
+  "end_seconds": 889.8,
+  "title_suggestion": "把气息放稳，长音就更容易唱准",
+  "summary": "教师用示范前后对比讲解长音气息控制，并回应学员提问。",
+  "category": "教学示范与答疑",
+  "score": 0.91,
+  "score_breakdown": {"topic_value": 0.94, "clarity": 0.90, "emotion": 0.72, "interaction": 0.82, "standalone": 0.93},
+  "evidence": [{"type":"transcript", "start_seconds":850.1, "end_seconds":873.6, "text":"……"}],
+  "review_status": "needs_review"
+}</pre>
+<h2>七、后端服务与数据处理</h2>
+<h3>7.1 服务模块</h3>
+<ul><li><b>媒体服务：</b>文件探测、校验、代理视频、抽取音频、关键帧与波形；保留原片，不对原始文件做破坏性修改。</li><li><b>转写服务：</b>输出带词级或句级时间戳的文本、语言、置信度；支持人工纠错。</li><li><b>内容理解服务：</b>章节切分、主题归纳、问答/示范/总结等事件识别；涉及情绪时只作为弱信号，不单独决定是否高光。</li><li><b>高光排序服务：</b>结合语义价值、信息完整性、可独立观看性、音视频质量、互动信号、重复度与��险项评分。</li><li><b>剪辑计划服务：</b>将候选时间范围扩展上下文后自动找句界/静音边界，再裁紧；避免截断问题、回答、歌曲乐句或关键动作。</li><li><b>HyperFrames 生产服务：</b>从受控模板与 JSON 参数生成项目；执行 CLI 检查、预览/抽帧审核与渲染；记录 CLI 版本和素材哈希。</li><li><b>任务队列：</b>将上传后分析、代理生成、渲染等拆为可重试的幂等任务；设置并发、超时、优先级及失败队列。</li></ul>
+<h3>7.2 高光评分建议</h3>
+<p>初期可采用可解释的加权规则，不应宣称模型能准确预知传播效果。建议分项为：主题/知识价值 30%、表达清晰与信息完整 25%、独立成片能力 20%、互动或情绪变化 10%、画面/声音质量 10%、新颖性 5%。重复片段、严重噪声、语义不完整、授权不明属于扣分或阻断条件。通过离线人工标注集评估命中率后再调整权重；教师示范和歌唱表演场景可以配置不同权重。高光分数用于排序，不等于发布保证。</p>
+<h2>八、HyperFrames 视频包装与交付规范</h2>
+<h3>8.1 视频画面与模板内容</h3>
+<p>默认社交平台竖屏 9:16、1080×1920、30fps；同时支持 16:9 与 1:1。每条切片可包含：主体直播视频、动态字幕、章节/主题标题、重点词强调、讲师姓名/课程角标、品牌色图形、转场或轻量动画、可选背景音乐、封面海报。画面内容放在安全区域内，字幕对比度足够、字号照顾中老年观看者；不得遮挡口型、乐器或教学动作。</p>
+<h3>8.2 片头、片尾与首尾帧一致</h3>
+<div class="callout"><b>硬性验收要求：</b>首帧与最后一帧显示同一张海报的同一构图、尺寸、位置、色彩及文字。实现方式为复用同一个静态 poster 图层/素材与相同 CSS 状态，不分别生成两张近似图。片头从海报状态进入内容，片尾从内容回到完全相同的海报状态；最后一帧在动画结束后保留静止海报。</div>
+<ul><li>首帧 t=0：完整静态海报（品牌、标题、讲师/课程信息），不加随机或依赖实时网络的内容。</li><li>片头：海报停留约 0.5–1.0 秒后，以淡出/缩放/遮罩等轻动画进入切片；动画必须可按时间轴确定性 seek。</li><li>主体：高光视频、逐句字幕、必要的强调动画、可选提示图形。</li><li>片尾：主体结束后回到与 t=0 完全相同的海报视觉状态；片尾停留约 0.8–1.5 秒，便于识别课程/账号。</li><li>音频：片头片尾可配轻音乐与淡入淡出；视觉帧一致是强制要求，音频不必首尾波形相同。音乐须有明确授权；避免掩盖原声与歌唱内容。</li><li>验收：用 FFmpeg 抽取首帧与最后一帧进行像素比较；如编码造成少量差异，需在渲染前验证两者来自相同海报状态并设定像素容差，同时人工检查标题、色彩和布局完全一致。</li></ul>
+<h3>8.3 HyperFrames 工程执行约定</h3>
+<p>每个输出项目保存根组合、场景组合、素材与渲染参数。时间元素按 HyperFrames 约定声明 class="clip"、data-start、data-duration；每个场景注册暂停时间线，保证渲染可确定性。视频按时间线配置音频属性，音乐使用独立 audio 轨道；素材使用项目内相对路径。渲染前执行 <code>npx hyperframes check --json</code>，处理错误并审查警告；新模板先预览和抽帧检查，再批量生产。不得在组合中依赖网络请求、系统当前时间、非固定随机数或不可 seek 的动画。</p>
+<h3>8.4 字幕、动画、图画与音乐规则</h3>
+<ul><li><b>字幕：</b>逐句同步、标点规范、简体中文；关键词可着色/加粗，但不整屏跳动；字幕应可编辑并导出 SRT/VTT。</li><li><b>动画：</b>字幕入场、标题卡、重点词提示、转场均以时间轴驱动；动画适度、清晰、不造成眩晕。</li><li><b>图画/图形：</b>可用品牌图标、乐谱符号、气息/节奏提示等轻量辅助画面；内容须与讲解一致，不能凭空生成错误乐理信息。</li><li><b>音乐：</b>优先保留教师讲解、歌唱示范原声；BGM 音量自动 ducking，讲解/演唱期间降低或关闭。素材必须记录来源、许可证、用途和有效期。</li><li><b>封面海报：</b>基于首帧/片尾统一设计模板另导出静态封面；标题简短、易读，不能承诺片段中未出现的效果。</li></ul>
+<h2>九、数据模型与素材管理</h2>
+<table><tr><th>实体</th><th>主要字段（建议）</th></tr>
+<tr><td>Project</td><td>id、owner_id、name、scene、default_template_id、created_at</td></tr>
+<tr><td>Media</td><td>id、project_id、object_key、checksum、duration、width、height、fps、audio_tracks、consent_status、retention_until</td></tr>
+<tr><td>AnalysisJob</td><td>id、media_id、status、stage、progress、model_versions、error_code、created_at</td></tr>
+<tr><td>TranscriptSegment</td><td>id、job_id、start、end、text、speaker_id、confidence、edited_text</td></tr>
+<tr><td>Highlight</td><td>id、job_id、start、end、category、summary、title、score、evidence、review_status、version</td></tr>
+<tr><td>Template/Asset</td><td>id、type、object_key、license_source、license_scope、brand_variables、version</td></tr>
+<tr><td>Render</td><td>id、project_id、selected_highlights、template_version、composition_hash、status、output_keys、render_log</td></tr></table>
+<h2>十、内容安全、隐私与质量控制</h2>
+<ul><li>上传时确认用户有权处理直播录像、人物肖像/声音及背景音乐；观众发言和个人信息按最小化原则处理。</li><li>下载链接短时有效；按租户隔离对象存储；传输与存储加密；提供删除入口和可核验的删除任务状态。</li><li>未成年人、隐私泄露、医疗/财务等敏感内容、诽谤或明显侵权片段可标记为需人工审核或禁止导出。</li><li>模型输出保留来源证据和置信度；不得把自动摘要伪装成逐字原话；字幕低置信段显著提示人工校对。</li><li>渲染质量检查至少包括：可播放、时长/画幅正确、音画同步、字幕无截断、无黑帧/静帧异常、首尾海报一致、音乐授权记录完整。</li></ul>
+<h2>十一、分阶段实施与验收标准</h2>
+<table><tr><th>阶段</th><th>交付范围</th><th>建议验收</th></tr>
+<tr><td>一期：可用原型</td><td>上传单条直播、ASR、候选高光���人工挑选、一个 HyperFrames 竖屏模板、导出 MP4</td><td>任务可追踪；候选有证据；人工能改边界；成片可播放；首尾海报同源一致</td></tr>
+<tr><td>二期：编辑与包装</td><td>时间线编辑、字幕校正、封面、片头片尾动画、音乐、SRT 导出、多种时长/画幅</td><td>可保存草稿并重渲染；字幕和配乐可控；模板复用正常；首尾帧自动比对</td></tr>
+<tr><td>三期：批量与优化</td><td>批量任务、模板管理、用户反馈分析、质量报表、队列扩缩容</td><td>可观测任务成功率/耗时/成本；错误可重试；高光质量按人工抽检持续评估</td></tr>
+<tr><td>四期：生产运营</td><td>多租户、审计、权限、保留策略、更多内容场景与平台规格</td><td>通过安全与授权流程审查；删除和审计可追踪；生产故障有告警与恢复预案</td></tr></table>
+<h2>十二、建议的 MVP 默认配置</h2>
+<ul><li>一次处理一条 MP4/MOV 直播录像；先实现中文普通话。</li><li>每条直播最多推荐 8 个候选，默认时长 20–60 秒；允许用户另选 15/30/60 秒剪辑目标。</li><li>默认输出 9:16、1080×1920、30fps；原声优先、BGM 默认关闭或极低音量，待用户选择有授权的曲库。</li><li>采用固定品牌模板，包含同源片头/片尾海报、清晰字幕、轻量动画与可选配图。</li><li>分析输出默认“待人工确认”；未经用户确认，不自动公开发布或投放。</li></ul>
+<h2>十三、风险与应对</h2>
+<table><tr><th>风险</th><th>应对方式</th></tr>
+<tr><td>ASR 错字导致亮点误判或字幕错误</td><td>显示置信度、转写证据与人工校对；关键术语词表；低置信片段不直接自动发布</td></tr>
+<tr><td>高光分高但片段上下文不完整</td><td>评分加入独立成片性；剪辑边界按句子/乐句扩展；预览时显示前后文</td></tr>
+<tr><td>直播编码不稳定、超长文件</td><td>先探测与代理转码；分阶段队列；对象存储分片上传；失败可续跑</td></tr>
+<tr><td>音乐、肖像或直播内容授权不明</td><td>上传声明、素材许可记录、限制下载/分享；提供删除与投诉处理机制</td></tr>
+<tr><td>首尾海报看似一致但帧并不相同</td><td>复用同一静态海报组件及参数；固定根时间线；渲染后抽帧比较并纳入自动化验收</td></tr></table>
+<h2>十四、结论</h2>
+<p>建议先交付“可审核的自动高光候选 + 可编辑时间线 + HyperFrames 模板渲染”的最小闭环，再逐步提高自动化程度。成片质量的关键不只是转场或字幕，而是亮点识别的准确性、片段的上下文完整、歌唱/讲解声音清楚、字幕易读，以及用户能够轻松审核。HyperFrames 用于把这些已确定的剪辑决策稳定地转成可重复渲染的成片。</p>
+<h2>附录：HyperFrames 官方资料</h2>
+<ul><li>HyperFrames 项目与使用说明：<a href="https://github.com/heygen-com/hyperframes">https://github.com/heygen-com/hyperframes</a></li><li>官方文档入口：<a href="https://hyperframes.heygen.com/introduction">https://hyperframes.heygen.com/introduction</a></li><li>本方案按 HyperFrames 的 HTML 组合、时间属性、可 seek 动画、CLI 检查/预览/渲染工作流设计；具体 CLI 参数以项目实际安装版本文档为准。</li></ul>
+<p class="small">文档用途：产品立项、技术评审与研发拆解。API 路径和数据结构为建议接口，实施前应结合现有项目代码、部署环境、模型服务和权限体系确认。</p>
+</body>
+</html>
